@@ -1,0 +1,6 @@
+*.wav
+
+.classpath
+.settings
+.project
+bin
