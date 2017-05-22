@@ -37,6 +37,12 @@ public class Lora {
 	
 	private static final int FUZ_FACTOR = 2;
 	
+	public Lora() {
+		System.out.println("Lora is ready.....");
+		this.hashMap = new HashMap<Long, List<DataPoint>>();
+		this.matchMap = new HashMap<Integer, Map<Integer, Integer>>();
+	}
+	
 	public void run(){
 		ByteArrayOutputStream out = null;
 		try {
@@ -147,7 +153,6 @@ public class Lora {
 		    results[times] = FFT.fft(complex);
 		}
 		
-		System.out.println(Arrays.toString(results));
 		return results;
 	}
 	

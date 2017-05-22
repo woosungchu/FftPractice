@@ -60,9 +60,11 @@ public class NayukiFft {
 		if (real.length != imag.length)
 			throw new IllegalArgumentException("Mismatched lengths");
 		int n = real.length;
+		
 		int levels = 31 - Integer.numberOfLeadingZeros(n);  // Equal to floor(log2(n))
 		if (1 << levels != n)
 			throw new IllegalArgumentException("Length is not a power of 2");
+		
 		double[] cosTable = new double[n / 2];
 		double[] sinTable = new double[n / 2];
 		for (int i = 0; i < n / 2; i++) {
@@ -113,6 +115,7 @@ public class NayukiFft {
 		if (real.length != imag.length)
 			throw new IllegalArgumentException("Mismatched lengths");
 		int n = real.length;
+		
 		if (n >= 0x20000000)
 			throw new IllegalArgumentException("Array too large");
 		int m = Integer.highestOneBit(n * 2) << 1;
