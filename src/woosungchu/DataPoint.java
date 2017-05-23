@@ -16,4 +16,9 @@ public class DataPoint {
 	public int getSongId() {
 		return songId;
 	}
+	
+	@Override
+	public String toString() {
+		return "songId = "+songId+" , time ="+time;
+	}
 }

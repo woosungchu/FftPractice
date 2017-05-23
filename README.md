@@ -1,5 +1,19 @@
 # ShazamPractice
 
+#### TEST
+```
+Lora is ready.....
+storing ... cash.wav
+storing ... outside.wav
+storing ... puth.wav
+storing ... JessieJBangBang.wav
+Result...
+SongId : 444 - 5729counts
+SongId : 333 - 13629counts
+SongId : 222 - 6266counts
+SongId : 111 - 5954counts
+```
+
 #### References
 - [http://royvanrijn.com](http://royvanrijn.com/blog/2010/06/creating-shazam-in-java/)
 - [Princeton.edu](http://introcs.cs.princeton.edu/java/32class/Complex.java.html)

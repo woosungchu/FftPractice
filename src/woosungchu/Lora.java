@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -31,7 +32,7 @@ public class Lora {
 	Map<Long, List<DataPoint>> hashMap;
 	Map<Integer, Map<Integer, Integer>> matchMap; // Map<SongId, Map<Offset,Count>>
 	
-	long songCount = 0;
+	long songId = 0;
 	
 	public final int[] RANGE = new int[] { 40, 80, 120, 180, UPPER_LIMIT + 1 };
 	
@@ -50,7 +51,6 @@ public class Lora {
 			
 			Complex[][] results = fft(out);
 			analyze(results);
-			songCount++;
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -59,6 +59,8 @@ public class Lora {
 	
 	public void run(File file){
 		ByteArrayOutputStream out = null;
+		isMatching = true;
+		
 		try {
 			if(file != null){
 				out = getAudio(file);
@@ -66,7 +68,40 @@ public class Lora {
 			
 			Complex[][] results = fft(out);
 			analyze(results);
-			songCount++;
+			
+			System.out.println("Result...");
+			for(Integer id : matchMap.keySet()){
+				int counts = 0;
+				Map<Integer, Integer> data = matchMap.get(id);
+				Iterator<Integer> it = data.keySet().iterator();
+				int key = 0 ;
+				
+				while(it.hasNext()){
+					key = it.next();
+					counts += data.get(key);
+				}
+				
+				System.out.println("SongId : " + id + " - " + counts +"counts");
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void store(File file, long index){
+		System.out.println("storing ... " + file.getName());
+		ByteArrayOutputStream out = null;
+		isMatching = false;
+		songId = index;
+		
+		try {
+			if(file != null){
+				out = getAudio(file);
+			}
+			
+			Complex[][] results = fft(out);
+			analyze(results);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -188,8 +223,6 @@ public class Lora {
 			}
 		}
 		
-		//de
-		
 		for (int t = 0; t < results.length; t++) {
 			for (int freq = LOWER_LIMIT; freq < UPPER_LIMIT - 1; freq++) {
 				// Get the magnitude:
@@ -206,11 +239,6 @@ public class Lora {
 				}
 			}
 			
-			//console
-			for (int k = 0; k < 5; k++) {
-				System.out.println("" + highscores[t][k] + ";" + recordPoints[t][k] + "\t");
-			}
-			
 			//hashing
 			long h = hash(points[t][0], points[t][1], points[t][2], points[t][3]);
 			
@@ -220,17 +248,18 @@ public class Lora {
 				if ((listPoints = hashMap.get(h)) != null) {
 					for (DataPoint dP : listPoints) {
 						int offset = Math.abs(dP.getTime() - t);
-						Map<Integer, Integer> tmpMap = null;
-						if ((tmpMap = this.matchMap.get(dP.getSongId())) == null) {
-							tmpMap = new HashMap<Integer, Integer>();
-							tmpMap.put(offset, 1);
-							matchMap.put(dP.getSongId(), tmpMap);
+						Map<Integer, Integer> counter = null;
+						
+						if ((counter = this.matchMap.get(dP.getSongId())) == null) {
+							counter = new HashMap<Integer, Integer>();
+							counter.put(offset, 1);
+							matchMap.put(dP.getSongId(), counter);
 						} else {
-							Integer count = tmpMap.get(offset);
+							Integer count = counter.get(offset);
 							if (count == null) {
-								tmpMap.put(offset, new Integer(1));
+								counter.put(offset, new Integer(1));
 							} else {
-								tmpMap.put(offset, new Integer(count + 1));
+								counter.put(offset, new Integer(count + 1));
 							}
 						}
 					}
@@ -239,11 +268,11 @@ public class Lora {
 				List<DataPoint> listPoints = null;
 				if ((listPoints = hashMap.get(h)) == null) {
 					listPoints = new ArrayList<DataPoint>();
-					DataPoint point = new DataPoint((int) songCount, t);
+					DataPoint point = new DataPoint((int) songId, t);
 					listPoints.add(point);
 					hashMap.put(h, listPoints);
 				} else {
-					DataPoint point = new DataPoint((int) songCount, t);
+					DataPoint point = new DataPoint((int) songId, t);
 					listPoints.add(point);
 				}
 			}
